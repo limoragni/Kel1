@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-public class A : MonoBehaviour {
+public class Character : MonoBehaviour {
 
 	List<Vector3> linePoints = new List<Vector3>();
 	LineRenderer lineRenderer;
@@ -12,12 +12,15 @@ public class A : MonoBehaviour {
 	Camera thisCamera;
 	int lineCount = 0;
 	
-	Vector3 lastPos = Vector3.one * float.MaxValue;
+	Vector3 lastPos;
+	Vector3 mouseWorld;
+	bool firstClick;
 
 	// Use this for initialization
 	void Start () {
 		thisCamera = Camera.main;
 		lineRenderer = GetComponent<LineRenderer>();
+
 	}
 	
 	// Update is called once per frame
@@ -25,36 +28,56 @@ public class A : MonoBehaviour {
 
 	}
 
-	void OnMouseDrag(){
-		Debug.Log("DRAG");
+	void OnMouseDown(){
+		GameObject ob = new GameObject();
+		LineRenderer ln = ob.AddComponent("LineRenderer") as LineRenderer;
+		lineRenderer = ln;
+		lineRenderer.SetWidth(startWidth, endWidth);
+
 		Vector3 mousePos = Input.mousePosition;
 		mousePos.z = thisCamera.nearClipPlane;
-		Vector3 mouseWorld = thisCamera.ScreenToWorldPoint(mousePos);
-		
-		float dist = Vector3.Distance(lastPos, mouseWorld);
-		
-		if(dist <= threshold)
-			return;
-		
-		lastPos = mouseWorld;
-		
-		if(linePoints == null)
-			linePoints = new List<Vector3>();
-		
-		linePoints.Add(mouseWorld);
-		
-		UpdateLine();
+		mouseWorld = thisCamera.ScreenToWorldPoint(mousePos);
 
-//		Vector2 p = new Vector2(Input.mousePosition.x,Input.mousePosition.y);
-//		
-//		//tab.Add(p);
-//
-//		Debug.Log ("click dentro de la A");
+		lineRenderer.SetVertexCount(1);
+		lineRenderer.SetPosition(0, mouseWorld);
+
+
+		lastPos = mouseWorld;
+		firstClick = false;
+
+		linePoints.Clear ();
 	}
 
-	void UpdateLine()
-	{
-		lineRenderer.SetWidth(startWidth, endWidth);
+	void OnMouseUp(){
+		firstClick = true;
+	}
+
+	void OnMouseDrag(){
+		if(!firstClick){
+			Vector3 mousePos = Input.mousePosition;
+			mousePos.z = thisCamera.nearClipPlane;
+			mouseWorld = thisCamera.ScreenToWorldPoint(mousePos);
+			
+			float dist = Vector3.Distance(lastPos, mouseWorld);
+			
+			if(dist <= threshold)
+				return;
+			
+			lastPos = mouseWorld;
+			
+			if(linePoints == null)
+				linePoints = new List<Vector3>();
+			
+			linePoints.Add(mouseWorld);
+			
+			UpdateLine();
+		}
+
+
+	}
+
+	void UpdateLine(){
+
 		lineRenderer.SetVertexCount(linePoints.Count);
 		
 		for(int i = lineCount; i < linePoints.Count; i++)
