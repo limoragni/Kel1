@@ -5,6 +5,7 @@ public class Path : MonoBehaviour {
 
 	public GameObject startNode;
 	public GameObject endNode;
+	public int counter;
 	public bool complete;
 
 	// Use this for initialization

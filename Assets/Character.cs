@@ -11,6 +11,7 @@ public class Character : MonoBehaviour {
 	public float threshold = 0.001f;
 	Camera thisCamera;
 	int lineCount = 0;
+	private GameObject lastLine; 
 	
 	Vector3 lastPos;
 	Vector3 mouseWorld;
@@ -34,6 +35,9 @@ public class Character : MonoBehaviour {
 		lineRenderer = ln;
 		lineRenderer.SetWidth(startWidth, endWidth);
 
+		// Referencia a la variable privada para borrarla en mouseup
+		lastLine = ob;
+
 		Vector3 mousePos = Input.mousePosition;
 		mousePos.z = thisCamera.nearClipPlane;
 		mouseWorld = thisCamera.ScreenToWorldPoint(mousePos);
@@ -50,6 +54,7 @@ public class Character : MonoBehaviour {
 
 	void OnMouseUp(){
 		firstClick = true;
+		Destroy(lastLine);
 	}
 
 	void OnMouseDrag(){
